@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <!-- Html Head Tag-->
+  <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="storMaroon">
+  <!-- Open Graph Data -->
+  <meta property="og:title" content="python3_coroutine"/>
+  <meta property="og:description" content="" />
+  <meta property="og:site_name" content="Hexo"/>
+  <meta property="og:type" content="article" />
+  <meta property="og:image" content="http://yoursite.comundefined"/>
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+
+  <!-- Site Title -->
+  <title>Hexo</title>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <!-- Custom CSS -->
+  
+  <link rel="stylesheet" href="/css/style.light.css">
+
+  <!-- Google Analytics -->
+  
+
+</head>
+
+  <body>
+    <!-- Page Header -->
+
+
+<header class="site-header header-background" style="background-image: url(/img/default-banner-dark.jpg)">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <div class="page-title with-background-image">
+          <p class="title">python3_coroutine</p>
+          <p class="subtitle"></p>
+        </div>
+        <div class="site-menu with-background-image">
+          <ul>
+            
+              <li>
+                <a href="/">
+                  
+                  Home
+                  
+                </a>
+              </li>
+            
+              <li>
+                <a href="/archives">
+                  
+                  Archives
+                  
+                </a>
+              </li>
+            
+              <li>
+                <a href="https://github.com/levblanc">
+                  
+                  Github
+                  
+                </a>
+              </li>
+            
+              <li>
+                <a href="mailto:levblanc@163.com">
+                  
+                  Email
+                  
+                </a>
+              </li>
+            
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+<article>
+  <div class="container typo">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <div class="post-info text-muted">
+          
+            <!-- Author -->
+            <span class="author info">By storMaroon</span>
+          
+          <!-- Date -->
+          <span class="date-time info">On
+            <span class="date">2016-12-01</span>
+            <span class="time">17:49:11</span>
+          </span>
+          
+          <!--  Categories  -->
+            <span class="categories info">Under 
+
+<a href="/categories/coding/">coding</a>
+</span>
+          
+        </div>
+        <!-- Tags -->
+        
+          <div class="post-tags text-muted">
+            Tags: 
+
+<a class="tag" href="/tags/python3/">#python3</a>
+
+
+          </div>
+        
+        <!-- Post Main Content -->
+        <div class="post-content">
+          <h1 id="python3-协程笔记"><a href="#python3-协程笔记" class="headerlink" title="python3 协程笔记"></a>python3 协程笔记</h1><p>学习python协程中的一些笔记和见解</p>
+<a id="more"></a>
+<h2 id="迭代器中的-send-方法"><a href="#迭代器中的-send-方法" class="headerlink" title="迭代器中的 send() 方法"></a>迭代器中的 <code>send()</code> 方法</h2><p>学python的时候在协程这块卡了一下，主要是下面代码的 <code>c.send(None)</code> 不理解</p>
+<p>代码摘自 <a href="http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432090171191d05dae6e129940518d1d6cf6eeaaa969000#0" target="_blank" rel="external">廖雪峰的python教程</a></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">def consumer():</div><div class="line">    r = ''</div><div class="line">    while True:</div><div class="line">        n = yield r</div><div class="line">        if not n:</div><div class="line">            return</div><div class="line">        print('[CONSUMER] Consuming %s...' % n)</div><div class="line">        r = '200 OK</div><div class="line"></div><div class="line">def produce(c):</div><div class="line">    c.send(None)</div><div class="line">    n = 0</div><div class="line">    while n &lt; 5:</div><div class="line">        n = n + 1</div><div class="line">        print('[PRODUCER] Producing %s...' % n)</div><div class="line">        r = c.send(n)</div><div class="line">        print('[PRODUCER] Consumer return: %s' % r)</div><div class="line">    c.close()</div><div class="line"></div><div class="line">c = consumer()</div><div class="line">produce(c)</div></pre></td></tr></table></figure>
+<p>通过 google 找到了一篇 <a href="http://stackoverflow.com/questions/12637768/python-3-send-method-of-generators" target="_blank" rel="external">stackoverflow</a> 上面的解答：</p>
+<blockquote>
+<p>The most confusing part should be this line <code>X = yield i</code>,<br>specially when you call <code>send()</code> on the generator. Actually the only thing you need to know is:<br>in the lexical level: <code>next()</code> is equal to <code>send(None)</code><br>in the interpreter level: <code>X = yield i</code> equals to below lines( <strong>ORDER MATTERS</strong> ):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&gt; <span class="keyword">yield</span> i</div><div class="line">&gt; <span class="comment"># won't continue until next() or send() is called</span></div><div class="line">&gt; <span class="comment"># and this is also the entry point of next() or send()</span></div><div class="line">&gt; X = the_input_of_send</div><div class="line">&gt;</div></pre></td></tr></table></figure>
+</blockquote>
+<p>&gt;</p>
+<blockquote>
+<p>and, the 2 lines of comment is the exact reason, why we need to call <code>send(None)</code> for the first time,<br>because the generator will <code>return i (yield i)</code> before assign the value to X</p>
+</blockquote>
+<p>从中可以总结出两点:</p>
+<ul>
+<li><code>send(None)</code> 的作用跟调用 <code>next()</code>  是一样的</li>
+<li><code>X = yield i</code> 其实是分两步执行的，先执行 <code>yield i</code>， 然后把 <code>send(n)</code> 中传入的n赋值给 X</li>
+</ul>
+<p>根据这个可以得出上面代码的执行顺序：</p>
+<ol>
+<li>先在 <code>produce</code> 中执行 <code>send(None)</code>, 相当于先调用一次 <code>next()</code>, 这时 <code>consumer</code> 会 <code>yield r</code> 并将r的值 <code>&#39;&#39;</code> 一个空字符串返回， 然后等待</li>
+<li>返回 <code>produce</code> 后对n加一然后通过 <code>send(n)</code> 把修改后的n传入 <code>consumer</code>, 程序从刚才 <code>yield</code> 的地方继续执行, 先把传入的n赋值给n，打印出字符串并给r赋值</li>
+<li>之后的调用都是重复返回r的值，然后等待n输入</li>
+</ol>
+<p>重点就是 <code>X = yield i</code> 这一句比较难理解，是先 <code>yield</code> 后等待赋值，所以要先调用一次 <code>next()</code> 或　<code>send(None)</code>, 这样才能做第一次 <code>yield</code> 来初始化</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+
+
+    <!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <p class="copyright text-muted">
+          Theme By <a target="_blank" href="https://github.com/levblanc">Levblanc.</a>
+          Inspired By <a target="_blank" href="https://github.com/klugjo/hexo-theme-clean-blog">Clean Blog.</a>
+        <p class="copyright text-muted">
+          Powered By <a target="_blank" href="https://hexo.io/">Hexo.</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+    <!-- After Footer Scripts -->
+<script src="/js/highlight.pack.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function(event) {
+    var codeBlocks = Array.prototype.slice.call(document.getElementsByTagName('pre'))
+    codeBlocks.forEach(function(block, index) {
+      hljs.highlightBlock(block);
+    });
+  });
+</script>
+
+  </body>
+</html>
+
